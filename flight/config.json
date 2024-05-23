@@ -1,0 +1,12 @@
+{
+  "screenWidth": 1024,
+  "screenHeight": 600,
+  "title": "外星人入侵",
+  "shipSpeedFactor": 10,
+  "bgColor": {
+    "r": 230,
+    "g": 230,
+    "b": 230,
+    "a": 255
+  }
+}
