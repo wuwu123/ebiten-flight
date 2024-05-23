@@ -3,6 +3,8 @@ package flight
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+	"image/color"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -12,9 +14,13 @@ import (
 	"path/filepath"
 )
 
+type GameMatrix struct {
+	X float64
+	Y float64
+}
 type Game struct {
 	input  *Input
-	cfg    *Config
+	cfg    Config
 	ship   *Ship
 	player *Player
 }
@@ -27,7 +33,7 @@ func NewGame() *Game {
 	return &Game{
 		input:  &Input{},
 		cfg:    cfg,
-		ship:   NewShip(cfg.ScreenWidth, cfg.ScreenHeight),
+		ship:   NewShip(cfg),
 		player: NewPlayer(),
 	}
 }
@@ -57,9 +63,11 @@ type Ship struct {
 	y      float64
 	minx   float64
 	maxx   float64
+	bullet []*GameMatrix
+	config Config
 }
 
-func NewShip(screenWidth, screenHeight int) *Ship {
+func NewShip(config Config) *Ship {
 	cwd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -71,7 +79,9 @@ func NewShip(screenWidth, screenHeight int) *Ship {
 	}
 
 	width, height := img.Bounds().Dx(), img.Bounds().Dy()
+	screenWidth, screenHeight := config.ScreenWidth, config.ScreenHeight
 	ship := &Ship{
+		config: config,
 		image:  img,
 		width:  width,
 		height: height,
@@ -83,8 +93,16 @@ func NewShip(screenWidth, screenHeight int) *Ship {
 	return ship
 }
 
-func (ship *Ship) Draw(screen *ebiten.Image, cfg *Config) {
+func (ship *Ship) Draw(screen *ebiten.Image, cfg Config) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(ship.x, ship.y)
 	screen.DrawImage(ship.image, op)
+	for i, v := range ship.bullet {
+		v.Y -= ship.config.GridSize
+		if v.Y <= 0 {
+			ship.bullet = ship.bullet[:i]
+			continue
+		}
+		vector.DrawFilledRect(screen, float32(v.X), float32(v.Y), float32(ship.config.GridSize), float32(ship.config.GridSize), color.RGBA{0x80, 0xa0, 0xc0, 0xff}, false)
+	}
 }

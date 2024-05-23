@@ -16,13 +16,14 @@ type Config struct {
 	Title           string      `json:"title"`
 	BgColor         color.NRGBA `json:"bgColor"`
 	ShipSpeedFactor float64     `json:"shipSpeedFactor"`
+	GridSize        float64     `json:"gridSize"`
 }
 
-func loadConfig() *Config {
+func loadConfig() Config {
 	var cfg Config
 	err := json.Unmarshal(configJson, &cfg)
 	if err != nil {
 		log.Fatalf("json.Decode failed: %v\n", err)
 	}
-	return &cfg
+	return cfg
 }
