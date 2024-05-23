@@ -2,8 +2,8 @@
   "screenWidth": 1024,
   "screenHeight": 600,
   "title": "外星人入侵",
-  "shipSpeedFactor": 10,
-  "gridSize": 10,
+  "shipSpeedFactor": 3,
+  "gridSize": 15,
   "bgColor": {
     "r": 230,
     "g": 230,

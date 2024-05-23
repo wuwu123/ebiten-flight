@@ -23,6 +23,8 @@ type Game struct {
 	cfg    Config
 	ship   *Ship
 	player *Player
+	bullet *Bullet
+	winNum int
 }
 
 func NewGame() *Game {
@@ -30,11 +32,13 @@ func NewGame() *Game {
 	ebiten.SetWindowSize(cfg.ScreenWidth, cfg.ScreenHeight)
 	ebiten.SetWindowTitle(cfg.Title)
 
+	var ship = NewShip(cfg)
 	return &Game{
 		input:  &Input{},
 		cfg:    cfg,
-		ship:   NewShip(cfg),
+		ship:   ship,
 		player: NewPlayer(),
+		bullet: NewBullet(ship.height),
 	}
 }
 
@@ -42,6 +46,18 @@ func NewGame() *Game {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(g.cfg.BgColor)
 	g.ship.Draw(screen, g.cfg)
+	g.bullet.Draw(screen, g.cfg)
+	for shipIndex, shipIterm := range g.ship.bullet {
+		for bulletIndex, bulletIterm := range g.bullet.List {
+			if bulletIterm.X >= shipIterm.X-g.cfg.GridSize/2 && bulletIterm.X <= shipIterm.X+g.cfg.GridSize/2 {
+				if bulletIterm.Y >= shipIterm.Y-g.cfg.GridSize/2 && bulletIterm.Y <= shipIterm.Y+g.cfg.GridSize/2 {
+					g.winNum++
+					g.ship.bullet = SliceRemove(g.ship.bullet, shipIndex)
+					g.bullet.List = SliceRemove(g.bullet.List, bulletIndex)
+				}
+			}
+		}
+	}
 }
 
 // 该方法接收游戏窗口的尺寸作为参数，返回游戏的逻辑屏幕大小
@@ -52,6 +68,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 // 每个tick都会被调用。tick是引擎更新的一个时间单位，默认为1/60s。tick的倒数我们一般称为帧，即游戏的更新频率。
 func (g *Game) Update() error {
 	g.input.Update(g.ship, g.cfg)
+	g.bullet.Update(g.cfg)
 	return g.player.Update()
 }
 
@@ -100,7 +117,7 @@ func (ship *Ship) Draw(screen *ebiten.Image, cfg Config) {
 	for i, v := range ship.bullet {
 		v.Y -= ship.config.GridSize
 		if v.Y <= 0 {
-			ship.bullet = ship.bullet[:i]
+			ship.bullet = SliceRemove(ship.bullet, i)
 			continue
 		}
 		vector.DrawFilledRect(screen, float32(v.X), float32(v.Y), float32(ship.config.GridSize), float32(ship.config.GridSize), color.RGBA{0x80, 0xa0, 0xc0, 0xff}, false)
