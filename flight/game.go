@@ -129,7 +129,7 @@ func (ship *Ship) AutoBullet() {
 	if !ship.config.ShipAutoBullet {
 		return
 	}
-	ticker := time.NewTicker(100 * time.Millisecond)
+	ticker := time.NewTicker(70 * time.Millisecond)
 	//defer ticker.Stop()
 	go func() {
 		for {

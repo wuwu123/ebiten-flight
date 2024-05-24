@@ -2,7 +2,7 @@
   "screenWidth": 1024,
   "screenHeight": 600,
   "title": "打呀，打灰机",
-  "shipSpeedFactor": 5,
+  "shipSpeedFactor": 7,
   "shipAutoBullet": true,
   "gridSize": 16,
   "bgColor": {

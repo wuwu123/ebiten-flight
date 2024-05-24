@@ -23,7 +23,7 @@ func (l *Bullet) Update(config Config) {
 	l.lastNum += 1
 	if l.lastNum%20 == 0 {
 		l.lastNum = 0
-		runNum, _ := rand.Int(rand.Reader, big.NewInt(int64(config.ScreenWidth-int(config.GridSize))))
+		runNum, _ := rand.Int(rand.Reader, big.NewInt(int64(config.ScreenWidth-2*int(config.GridSize))))
 		if float64(runNum.Int64()) >= config.GridSize {
 			var newY = float64(runNum.Int64())
 			l.List = append(l.List, &GameMatrix{
