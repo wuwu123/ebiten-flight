@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
-	"os"
-	"path/filepath"
 )
 
 const (
@@ -36,17 +34,7 @@ func (g *Player) Update() error {
 		g.audioContext = audio.NewContext(sampleRate)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	staticDir := filepath.Join(cwd, "flight", "music", "CMJ.ogg")
-	fileByte, err := os.ReadFile(staticDir)
-	if err != nil {
-		panic(err)
-	}
-
-	oggS, err := vorbis.DecodeWithoutResampling(bytes.NewReader(fileByte))
+	oggS, err := vorbis.DecodeWithoutResampling(bytes.NewReader(MusicOgg))
 	if err != nil {
 		return err
 	}

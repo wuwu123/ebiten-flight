@@ -1,12 +1,11 @@
 package flight
 
 import (
+	"bytes"
+	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
-	"os"
-	"path"
-	"path/filepath"
 )
 
 type Done struct {
@@ -17,12 +16,13 @@ type Done struct {
 }
 
 func NewDone(config Config) *Done {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	staticDir := filepath.Join(cwd, "flight", "images")
-	overImg, _, err := ebitenutil.NewImageFromFile(path.Join(staticDir, "over.jpeg"))
+	//cwd, err := os.Getwd()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//staticDir := filepath.Join(cwd, "flight", "images")
+	//overImg, _, err := ebitenutil.NewImageFromFile(path.Join(staticDir, "over.jpeg"))
+	overImg, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(OverImgData))
 	if err != nil {
 		log.Fatal(err)
 	}

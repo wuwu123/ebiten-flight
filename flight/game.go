@@ -1,18 +1,18 @@
 package flight
 
 import (
+	"bytes"
+	_ "embed"
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"image/color"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"log"
-	"os"
-	"path"
-	"path/filepath"
 	"time"
 )
 
@@ -36,7 +36,6 @@ func NewGame() *Game {
 	cfg := loadConfig()
 	ebiten.SetWindowSize(cfg.ScreenWidth, cfg.ScreenHeight)
 	ebiten.SetWindowTitle(cfg.Title)
-
 	var ship = NewShip(cfg)
 	return &Game{
 		input:  &Input{},
@@ -99,12 +98,7 @@ type Ship struct {
 }
 
 func NewShip(config Config) *Ship {
-	cwd, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	staticDir := filepath.Join(cwd, "flight", "images")
-	img, _, err := ebitenutil.NewImageFromFile(path.Join(staticDir, "780.jpeg"))
+	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(ShipImp))
 	if err != nil {
 		log.Fatal(err)
 	}

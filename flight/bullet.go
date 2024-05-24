@@ -41,13 +41,12 @@ func (l *Bullet) Draw(screen *ebiten.Image, config Config) bool {
 	for i, v := range l.List {
 		v.Y += 1
 		if v.Y >= float64(config.ScreenHeight-l.bottomHeight-int(config.GridSize)) {
-			return false
 			if i+1 >= listLen {
 				l.List = append(l.List[:i])
 			} else {
 				l.List = append(l.List[:i], l.List[i+1:]...)
 			}
-			continue
+			return false
 		}
 		vector.DrawFilledRect(screen, float32(v.X), float32(v.Y), float32(config.GridSize), float32(config.GridSize), color.RGBA{0x80, 0xa0, 0xc0, 0xff}, false)
 	}
