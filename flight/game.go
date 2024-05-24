@@ -1,6 +1,7 @@
 package flight
 
 import (
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
@@ -12,6 +13,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 type GameMatrix struct {
@@ -25,6 +27,9 @@ type Game struct {
 	player *Player
 	bullet *Bullet
 	winNum int
+	text   *Text
+	over   bool
+	done   *Done
 }
 
 func NewGame() *Game {
@@ -39,25 +44,34 @@ func NewGame() *Game {
 		ship:   ship,
 		player: NewPlayer(),
 		bullet: NewBullet(ship.height),
+		text:   &Text{},
+		done:   NewDone(cfg),
 	}
 }
 
 // 每帧（frame）调用。帧是渲染使用的一个时间单位，依赖显示器的刷新率。如果显示器的刷新率为60Hz，Draw将会每秒被调用60次
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(g.cfg.BgColor)
-	g.ship.Draw(screen, g.cfg)
-	g.bullet.Draw(screen, g.cfg)
-	for shipIndex, shipIterm := range g.ship.bullet {
-		for bulletIndex, bulletIterm := range g.bullet.List {
-			if bulletIterm.X >= shipIterm.X-g.cfg.GridSize/2 && bulletIterm.X <= shipIterm.X+g.cfg.GridSize/2 {
-				if bulletIterm.Y >= shipIterm.Y-g.cfg.GridSize/2 && bulletIterm.Y <= shipIterm.Y+g.cfg.GridSize/2 {
-					g.winNum++
-					g.ship.bullet = SliceRemove(g.ship.bullet, shipIndex)
-					g.bullet.List = SliceRemove(g.bullet.List, bulletIndex)
+	if g.over {
+		g.done.DrawOver(screen)
+
+	} else {
+		g.ship.Draw(screen, g.cfg)
+		g.over = !g.bullet.Draw(screen, g.cfg)
+		for shipIndex, shipIterm := range g.ship.bullet {
+			for bulletIndex, bulletIterm := range g.bullet.List {
+				if bulletIterm.X >= shipIterm.X-g.cfg.GridSize/2-3 && bulletIterm.X <= shipIterm.X+g.cfg.GridSize/2+3 {
+					if bulletIterm.Y >= shipIterm.Y-g.cfg.GridSize/2-3 && bulletIterm.Y <= shipIterm.Y+g.cfg.GridSize/2+3 {
+						g.winNum++
+						g.ship.bullet = SliceRemove(g.ship.bullet, shipIndex)
+						g.bullet.List = SliceRemove(g.bullet.List, bulletIndex)
+					}
 				}
 			}
 		}
 	}
+	g.text.Draw(screen, fmt.Sprintf("%d", g.winNum))
+
 }
 
 // 该方法接收游戏窗口的尺寸作为参数，返回游戏的逻辑屏幕大小
@@ -107,9 +121,25 @@ func NewShip(config Config) *Ship {
 		minx:   0,
 		maxx:   float64(screenWidth - width),
 	}
+	ship.AutoBullet()
 	return ship
 }
 
+func (ship *Ship) AutoBullet() {
+	if !ship.config.ShipAutoBullet {
+		return
+	}
+	ticker := time.NewTicker(100 * time.Millisecond)
+	//defer ticker.Stop()
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				ship.bullet = append(ship.bullet, &GameMatrix{X: ship.x + float64(ship.width/2) - ship.config.GridSize/2, Y: ship.y})
+			}
+		}
+	}()
+}
 func (ship *Ship) Draw(screen *ebiten.Image, cfg Config) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(ship.x, ship.y)
@@ -120,6 +150,6 @@ func (ship *Ship) Draw(screen *ebiten.Image, cfg Config) {
 			ship.bullet = SliceRemove(ship.bullet, i)
 			continue
 		}
-		vector.DrawFilledRect(screen, float32(v.X), float32(v.Y), float32(ship.config.GridSize), float32(ship.config.GridSize), color.RGBA{0x80, 0xa0, 0xc0, 0xff}, false)
+		vector.DrawFilledRect(screen, float32(v.X), float32(v.Y), float32(ship.config.GridSize), float32(ship.config.GridSize), color.RGBA{0x7f, 0x00, 0x00, 0x7f}, false)
 	}
 }

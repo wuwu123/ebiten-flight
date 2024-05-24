@@ -1,9 +1,10 @@
 {
   "screenWidth": 1024,
   "screenHeight": 600,
-  "title": "外星人入侵",
-  "shipSpeedFactor": 3,
-  "gridSize": 15,
+  "title": "打呀，打灰机",
+  "shipSpeedFactor": 5,
+  "shipAutoBullet": true,
+  "gridSize": 16,
   "bgColor": {
     "r": 230,
     "g": 230,

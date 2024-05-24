@@ -2,6 +2,7 @@ package flight
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"math/rand"
 )
 
 type Input struct {
@@ -12,6 +13,12 @@ func (l *Input) Update(ship *Ship, config Config) {
 	if ebiten.IsKeyPressed(ebiten.KeyUp) {
 		if !l.lastIsUp {
 			ship.bullet = append(ship.bullet, &GameMatrix{X: ship.x + float64(ship.width/2) - config.GridSize/2, Y: ship.y})
+			if rand.Intn(2) == 1 {
+				ship.bullet = append(ship.bullet, &GameMatrix{X: ship.x + float64(ship.width/2), Y: ship.y})
+			}
+			if rand.Intn(2) == 1 {
+				ship.bullet = append(ship.bullet, &GameMatrix{X: ship.x + float64(ship.width/2) + config.GridSize/2, Y: ship.y})
+			}
 		}
 		l.lastIsUp = true
 	} else {

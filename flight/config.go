@@ -17,6 +17,7 @@ type Config struct {
 	BgColor         color.NRGBA `json:"bgColor"`
 	ShipSpeedFactor float64     `json:"shipSpeedFactor"`
 	GridSize        float64     `json:"gridSize"`
+	ShipAutoBullet  bool        `json:"shipAutoBullet"`
 }
 
 func loadConfig() Config {
